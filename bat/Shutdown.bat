@@ -1,2 +1,2 @@
 @echo off
-shutdown.exe -s -t 10
+shutdown.exe -s -t 00
