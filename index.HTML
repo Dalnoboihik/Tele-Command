@@ -4,18 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель управления</title>
+    <script>
+    function updateCpu() {
+        fetch('/api/cpu')
+            .then(r => r.text())
+            .then(t => document.getElementById('cpu-value').textContent = t)
+            .catch(e => console.error(e));
+    }
+    setInterval(updateCpu, 1000);
+    updateCpu();
+</script>
 </head>
 <body>
     <h1>Панель управления</h1>
 
 
+    
     <button>Выключение</button>
     <button>Перезагрузка</button>
     <button onclick="fetch('/run_bat', {method: 'POST'})">Запуск bat</button>
 
-    <meter value="75" min="0" max="100">75%</meter> <!-- ЦП -->
-    <meter value="75" min="0" max="100">75%</meter> <!-- ОЗУ -->
-        <meter value="75" min="0" max="100">75%</meter> <!-- Памяь -->
+    
+    <h1>Загрузка CPU: <span id="cpu-value">{CPU}</span>%</h1>
+
+
 
 </body>
 </html>
