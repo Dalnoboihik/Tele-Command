@@ -13,19 +13,29 @@
     }
     setInterval(updateCpu, 1000);
     updateCpu();
+
+        function updateRam() {
+        fetch('/api/cpu')
+            .then(r => r.text())
+            .then(t => document.getElementById('ram-value').textContent = t)
+            .catch(e => console.error(e));
+    }
+    setInterval(updateRam, 1000);
+    updateRam();
 </script>
 </head>
 <body>
     <h1>Панель управления</h1>
 
 
-    
+
     <button>Выключение</button>
     <button>Перезагрузка</button>
     <button onclick="fetch('/run_bat', {method: 'POST'})">Запуск bat</button>
 
     
     <h1>Загрузка CPU: <span id="cpu-value">{CPU}</span>%</h1>
+    <h1>Загрузка RAM: <span id="ram-value">{RAM}</span>%</h1>
 
 
 

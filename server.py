@@ -12,8 +12,15 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             try:
                 with open('index.html', 'r', encoding='utf-8') as file:
                     html_template = file.read()
+
+
                 cpu = psutil.cpu_percent()
                 html = html_template.replace('{CPU}', str(cpu))
+
+                ram = psutil.virtual_memory()
+                html = html_template.replace('{RAM}', str(ram))
+
+
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html; charset=utf-8')
                 self.end_headers()
@@ -29,6 +36,12 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.end_headers()
             self.wfile.write(str(cpu).encode('utf-8'))
+        elif self.path == "/api/cpu":
+            ram = psutil.virtual_memory()
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(str(ram).encode('utf-8'))
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/html; charset=utf-8')
