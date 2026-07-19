@@ -30,7 +30,6 @@ If you download a pre‑compiled build (`.exe`), Windows may flag it as a keylog
 - **Script & file execution** – run custom commands and scripts directly from the panel.
 - **File manager** – browse, upload, delete, and edit server files.
 - **Lightweight** – minimal resource footprint.
-- **Extensible** – designed to be easily extended with new modules.
 
 ---
 
