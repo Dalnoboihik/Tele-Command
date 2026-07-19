@@ -54,5 +54,8 @@ pip install psutil
 # Run the panel
 python server.py
 ```
+📝 License
+This project is licensed under the MIT License – see the LICENSE file for details.
+
 👨‍💻 Authors
 <div align="center"> <a href="https://github.com/Dalnoboihik" style="background-color: #007bff; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: bold;">Dalnoboihik</a> </div>
