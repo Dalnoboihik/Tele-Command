@@ -53,6 +53,6 @@ pip install psutil
 
 # Run the panel
 python server.py
-
+```
 👨‍💻 Authors
 <div align="center"> <a href="https://github.com/Dalnoboihik" style="background-color: #007bff; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: bold;">Dalnoboihik</a> </div>
