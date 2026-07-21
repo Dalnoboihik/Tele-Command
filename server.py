@@ -1,4 +1,3 @@
-from HardView.LiveView import PyTempCpu
 import http.server
 import socketserver
 import subprocess
@@ -19,8 +18,6 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 cpu = psutil.cpu_percent()
                 ram = psutil.virtual_memory()
                 
-                cpu_temp = PyTempCpu()
-                temp = cpu_temp.get_temp()
                 
                 try:
                     key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"HARDWARE\DESCRIPTION\System\CentralProcessor\0")
@@ -34,7 +31,6 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 html = html.replace('{RAM}', str(ram.percent))
                 html = html.replace('{infoCPU}', infoCPU)  
                 html = html.replace('{infoRAM}', str(infoRAM))  
-                html = html.replace('{temp:.1f}', str(temp)) 
 
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html; charset=utf-8')
