@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Вход в систему</title>
+</head>
+<body>
+    <h2>Авторизация</h2>
+    
+    <label>Логин:</label>
+    <input type="text" id="username" required><br><br>
+    <label>Пароль:</label>
+    <input type="password" id="password" required><br><br>
+    <button onclick="login()">Войти</button>
+    
+    <div id="message" style="color:red;"></div>
+
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Отправляем POST запрос
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'username=' + encodeURIComponent(username) + 
+                      '&password=' + encodeURIComponent(password)
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Если успешно - переходим на панель
+                    window.location.href = '/dashboard';
+                } else {
+                    // Если ошибка - показываем сообщение
+                    document.getElementById('message').textContent = 'Неверный логин или пароль!';
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').textContent = 'Ошибка соединения!';
+            });
+        }
+    </script>
+</body>
+</html>
