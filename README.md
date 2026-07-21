@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Server Web Panel
+=======
+# BrewSpherix
+>>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
 
 <div align="center">
   <pre>
@@ -12,7 +16,11 @@
 
 ---
 
+<<<<<<< HEAD
 **Server Web Panel** is a browser‑based remote server management tool.  
+=======
+**BrewSpherix** is a browser‑based remote server management tool.  
+>>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
 It gives system administrators a clean, real‑time dashboard to monitor performance, control server power, execute scripts, and manage files – all from any modern browser.
 
 ---
@@ -30,7 +38,10 @@ If you download a pre‑compiled build (`.exe`), Windows may flag it as a keylog
 - **Script & file execution** – run custom commands and scripts directly from the panel.
 - **File manager** – browse, upload, delete, and edit server files.
 - **Lightweight** – minimal resource footprint.
+<<<<<<< HEAD
 - **Extensible** – designed to be easily extended with new modules.
+=======
+>>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
 
 ---
 
@@ -43,13 +54,31 @@ If you download a pre‑compiled build (`.exe`), Windows may flag it as a keylog
 
 ```bash
 # Clone the repository
+<<<<<<< HEAD
 git clone https://github.com/Dalnoboihik/server-web-panel.git
 
 # Navigate to the project
 cd server-web-panel
+=======
+git clone https://github.com/Dalnoboihik/brewspherix.git
+
+# Navigate to the project
+cd brewspherix
+>>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
 
 # Install dependencies
 pip install psutil
 
 # Run the panel
+<<<<<<< HEAD
 python server.py
+=======
+python server.py
+```
+📝 License
+This project is licensed under the MIT License
+
+
+👨‍💻 Authors
+<div align="center"> <a href="https://github.com/Dalnoboihik" style="background-color: #007bff; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: bold;">Dalnoboihik</a> </div>
+>>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
