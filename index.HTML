@@ -19,7 +19,6 @@ function updateRam() {
         .catch(e => console.error(e));
 }
 
-
 setInterval(updateCpu, 1000);
 setInterval(updateRam, 1000);
 
@@ -42,6 +41,7 @@ updateRam();
 
     <h1>Процессор: <span id="infoCPU">{infoCPU}</span></h1>
     <h1>Оперативная память: <span id="infoRAM">{infoRAM} ГБ</span></h1>
+    
 
 </body>
 </html>

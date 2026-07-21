@@ -7,6 +7,7 @@ import json
 import winreg
 from urllib.parse import urlparse, parse_qs
 
+
 PORT = 3000
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
@@ -109,6 +110,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             password = params.get('password', [''])[0]
             
             if username == 'admin' and password == 'admin':
+                # Устанавливаем cookie сессии
                 self.send_response(302)
                 self.send_header('Location', '/dashboard')
                 self.send_header('Set-Cookie', 'session=authenticated; Path=/')

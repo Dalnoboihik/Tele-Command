@@ -1,47 +1,404 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Вход в систему</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Вход · BrewSpherix</title>
+  <style>
+    /* Глобальный сброс и тёмная база */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0b0e14;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      position: relative;
+      overflow-x: hidden;
+      background-image: radial-gradient(circle at 20% 30%, #141b24 0%, #07090e 95%);
+    }
+
+    /* Контейнер с эффектом стекла и сеткой */
+    .glass-panel {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(18, 24, 34, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(70, 130, 200, 0.15);
+      border-radius: 2.5rem;
+      padding: 2.2rem 2rem 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(70, 130, 200, 0.1) inset;
+      position: relative;
+      z-index: 20;
+      transition: transform 0.2s ease;
+    }
+
+    /* Заголовок */
+    .glitch-title {
+      font-size: 2.1rem;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      color: #d6e6ff;
+      text-shadow: 0 0 8px rgba(60, 140, 255, 0.3);
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .glitch-title span {
+      background: linear-gradient(135deg, #b0d0ff, #6a9eff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 400;
+    }
+    .subhead {
+      color: #6f8bb0;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      border-left: 2px solid #2f4b70;
+      padding-left: 0.75rem;
+      margin-bottom: 2rem;
+      opacity: 0.7;
+    }
+
+    /* Поля ввода — тёмный хакерский стиль */
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8aa9d1;
+      margin-bottom: 0.4rem;
+      opacity: 0.7;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      background: rgba(8, 14, 22, 0.7);
+      border: 1px solid #263449;
+      border-radius: 2rem;
+      color: #e0edff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: 0.25s ease;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+      letter-spacing: 0.3px;
+    }
+
+    .input-group input:focus {
+      border-color: #3f7bc0;
+      box-shadow: 0 0 0 3px rgba(60, 130, 255, 0.2), inset 0 2px 6px #000;
+      background: rgba(12, 20, 32, 0.8);
+    }
+
+    .input-group input::placeholder {
+      color: #3f5675;
+      font-size: 0.8rem;
+      opacity: 0.5;
+    }
+
+    /* Кнопка — минималистично, без смайлов */
+    .login-btn {
+      width: 100%;
+      padding: 0.9rem;
+      margin-top: 0.5rem;
+      background: linear-gradient(145deg, #1f334d, #142230);
+      border: 1px solid #3b5f88;
+      border-radius: 3rem;
+      color: #d4e6ff;
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px #2b4870 inset;
+      text-transform: uppercase;
+      background: #172433;
+      backdrop-filter: blur(4px);
+    }
+
+    .login-btn:hover {
+      background: #1e3452;
+      border-color: #5a8ac9;
+      box-shadow: 0 8px 18px rgba(0, 30, 70, 0.6), 0 0 0 1px #3f7bc0 inset;
+      color: #f0f8ff;
+      transform: scale(1.01);
+    }
+
+    .login-btn:active {
+      transform: scale(0.97);
+      background: #101e31;
+    }
+
+    /* Сообщение об ошибке — убрали красный фон, теперь он почти незаметен, но функционален */
+    #message {
+      margin-top: 1.2rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      color: #b0b8c8;
+      text-align: center;
+      min-height: 1.8rem;
+      transition: 0.2s;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      backdrop-filter: none;
+      opacity: 0.6;
+    }
+
+    /* Подвал с копирайтом — только BREWSKI BrewSpherix 2026, полупрозрачный */
+    .footer-copy {
+      margin-top: 2.4rem;
+      text-align: center;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: rgba(120, 175, 220, 0.25);
+      text-shadow: 0 0 8px rgba(0,20,40,0.3);
+      border-top: 1px solid rgba(70, 110, 160, 0.06);
+      padding-top: 1.2rem;
+      font-weight: 300;
+      word-break: break-word;
+    }
+
+    .footer-copy strong {
+      font-weight: 400;
+      color: rgba(140, 195, 240, 0.3);
+      letter-spacing: 1.5px;
+    }
+
+    /* --- ЛЕТАЮЩИЕ КОМАНДЫ (фон) — УВЕЛИЧЕНА ЯРКОСТЬ И КОНТРАСТ --- */
+    .code-rain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      opacity: 0.6;  /* повышена общая непрозрачность */
+    }
+
+    .code-item {
+      position: absolute;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      opacity: 0.45;  /* ярче, чем было */
+      animation: floatCode 22s infinite linear alternate;
+      text-shadow: 0 0 12px rgba(70, 150, 255, 0.3), 0 0 30px rgba(40, 100, 200, 0.15);
+      will-change: transform;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    /* разные цвета для команд — яркие акценты */
+    .code-item:nth-child(4n+1) { color: #7bb3ff; opacity: 0.55; text-shadow: 0 0 14px #3f7bc0; }
+    .code-item:nth-child(4n+2) { color: #a8d0ff; opacity: 0.5; text-shadow: 0 0 12px #5a8ac9; }
+    .code-item:nth-child(4n+3) { color: #8fcbff; opacity: 0.6; text-shadow: 0 0 18px #2f6bb0; }
+    .code-item:nth-child(4n+4) { color: #b8dcff; opacity: 0.5; text-shadow: 0 0 16px #4a7fb5; }
+
+    /* анимации с разной скоростью */
+    @keyframes floatCode {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.35; }
+      25% { transform: translate(40px, -70px) rotate(2deg) scale(1.1); opacity: 0.6; }
+      50% { transform: translate(-30px, -20px) rotate(-1deg) scale(0.9); opacity: 0.5; }
+      75% { transform: translate(60px, 40px) rotate(3deg) scale(1.05); opacity: 0.65; }
+      100% { transform: translate(-20px, 80px) rotate(-2deg) scale(0.95); opacity: 0.4; }
+    }
+
+    .code-item:nth-child(odd) {
+      animation-duration: 27s;
+      animation-timing-function: ease-in-out;
+    }
+    .code-item:nth-child(3n) {
+      animation-duration: 19s;
+      animation-direction: alternate-reverse;
+    }
+    .code-item:nth-child(5n+2) {
+      animation-duration: 32s;
+    }
+
+    /* Мобильная адаптация */
+    @media (max-width: 480px) {
+      .glass-panel {
+        padding: 1.8rem 1.2rem 2rem;
+        border-radius: 2rem;
+        backdrop-filter: blur(6px);
+      }
+      .glitch-title {
+        font-size: 1.8rem;
+      }
+      .subhead {
+        font-size: 0.7rem;
+        margin-bottom: 1.6rem;
+      }
+      .input-group input {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+      }
+      .login-btn {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+      }
+      .code-item {
+        font-size: 0.7rem;
+        opacity: 0.5;
+      }
+      .footer-copy {
+        font-size: 0.7rem;
+        margin-top: 1.8rem;
+        padding-top: 1rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .glass-panel {
+        padding: 1.2rem 0.8rem 1.5rem;
+      }
+      .glitch-title {
+        font-size: 1.5rem;
+      }
+      .code-item {
+        font-size: 0.55rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h2>Авторизация</h2>
-    
-    <label>Логин:</label>
-    <input type="text" id="username" required><br><br>
-    <label>Пароль:</label>
-    <input type="password" id="password" required><br><br>
-    <button onclick="login()">Войти</button>
-    
-    <div id="message" style="color:red;"></div>
 
-    <script>
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            // Отправляем POST запрос
-            fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'username=' + encodeURIComponent(username) + 
-                      '&password=' + encodeURIComponent(password)
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Если успешно - переходим на панель
-                    window.location.href = '/dashboard';
-                } else {
-                    // Если ошибка - показываем сообщение
-                    document.getElementById('message').textContent = 'Неверный логин или пароль!';
-                }
-            })
-            .catch(error => {
-                document.getElementById('message').textContent = 'Ошибка соединения!';
-            });
+  <!-- ФОН: летающие команды с разных языков (ярче, насыщеннее) -->
+  <div class="code-rain" aria-hidden="true">
+    <div class="code-item" style="top: 8%; left: 5%;">print("hello world")</div>
+    <div class="code-item" style="top: 15%; right: 8%;">console.log("debug");</div>
+    <div class="code-item" style="top: 28%; left: 12%;">SELECT * FROM users;</div>
+    <div class="code-item" style="top: 45%; right: 3%;">function main() { return 0; }</div>
+    <div class="code-item" style="top: 60%; left: 6%;">int x = 42;</div>
+    <div class="code-item" style="top: 72%; right: 12%;">puts("Brew");</div>
+    <div class="code-item" style="top: 85%; left: 18%;">docker run -it</div>
+    <div class="code-item" style="top: 10%; left: 45%;">npm install</div>
+    <div class="code-item" style="top: 35%; left: 70%;">git commit -m "fix"</div>
+    <div class="code-item" style="top: 50%; left: 30%;">System.out.println("ok");</div>
+    <div class="code-item" style="top: 68%; left: 55%;">pip install flask</div>
+    <div class="code-item" style="top: 80%; left: 40%;">curl -X POST /api</div>
+    <div class="code-item" style="top: 5%; left: 80%;">#!/bin/bash</div>
+    <div class="code-item" style="top: 22%; left: 88%;">make build</div>
+    <div class="code-item" style="top: 42%; left: 15%;">λ (x) → x * 2</div>
+    <div class="code-item" style="top: 55%; left: 75%;">if (err) panic();</div>
+    <div class="code-item" style="top: 77%; left: 62%;">for (i=0; i<10; i++)</div>
+    <div class="code-item" style="top: 92%; left: 25%;">class Server { }</div>
+    <div class="code-item" style="top: 18%; left: 30%;">use std::io;</div>
+    <div class="code-item" style="top: 65%; left: 88%;">response.send(200)</div>
+    <div class="code-item" style="top: 30%; left: 52%;">import requests</div>
+    <div class="code-item" style="top: 48%; left: 48%;">const PORT = 8080;</div>
+    <div class="code-item" style="top: 88%; left: 78%;">echo "deploy"</div>
+    <div class="code-item" style="top: 12%; left: 65%;">terraform plan</div>
+    <div class="code-item" style="top: 38%; left: 35%;">void setup() { }</div>
+    <div class="code-item" style="top: 58%; left: 12%;">sudo systemctl start</div>
+    <div class="code-item" style="top: 73%; left: 48%;">new Promise((res) => {})</div>
+    <div class="code-item" style="top: 95%; left: 10%;"># include <stdio.h></div>
+    <div class="code-item" style="top: 25%; left: 78%;">kubectl apply -f</div>
+    <div class="code-item" style="top: 63%; left: 22%;">db.collection.find()</div>
+  </div>
+
+  <!-- Основная форма -->
+  <div class="glass-panel">
+    <h1 class="glitch-title">
+      <span>⧩</span> вход
+    </h1>
+    <div class="subhead">BrewSpherix · панель управления</div>
+
+    <div class="input-group">
+      <label for="username">логин</label>
+      <input type="text" id="username" placeholder="admin / user" autocomplete="username">
+    </div>
+
+    <div class="input-group">
+      <label for="password">пароль</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="login-btn" id="loginBtn">войти</button>
+
+    <!-- сообщение теперь без красного фона, почти незаметно -->
+    <div id="message"></div>
+
+    <!-- Копирайт: только BREWSKI BrewSpherix 2026, без лишнего текста -->
+    <div class="footer-copy">
+      <strong>BREWSKI BrewSpherix 2026</strong>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const messageDiv = document.getElementById('message');
+      const loginBtn = document.getElementById('loginBtn');
+
+      function login() {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+
+        messageDiv.textContent = '';
+
+        if (!username.trim() || !password.trim()) {
+          messageDiv.textContent = 'Заполните логин и пароль';
+          return;
         }
-    </script>
+
+        fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'username=' + encodeURIComponent(username) +
+                '&password=' + encodeURIComponent(password)
+        })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = '/dashboard';
+          } else {
+            messageDiv.textContent = 'Неверный логин или пароль!';
+          }
+        })
+        .catch(() => {
+          messageDiv.textContent = 'Ошибка соединения!';
+        });
+      }
+
+      loginBtn.addEventListener('click', login);
+
+      usernameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          passwordInput.focus();
+        }
+      });
+      passwordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          login();
+        }
+      });
+
+      usernameInput.focus();
+    })();
+  </script>
+
 </body>
 </html>
