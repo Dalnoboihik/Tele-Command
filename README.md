@@ -1,8 +1,6 @@
-<<<<<<< HEAD
 # Server Web Panel
 =======
 # BrewSpherix
->>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
 
 <div align="center">
   <pre>
@@ -20,8 +18,6 @@
 **Server Web Panel** is a browser‑based remote server management tool.  
 =======
 **BrewSpherix** is a browser‑based remote server management tool.  
->>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
-It gives system administrators a clean, real‑time dashboard to monitor performance, control server power, execute scripts, and manage files – all from any modern browser.
 
 ---
 
@@ -41,7 +37,6 @@ If you download a pre‑compiled build (`.exe`), Windows may flag it as a keylog
 <<<<<<< HEAD
 - **Extensible** – designed to be easily extended with new modules.
 =======
->>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
 
 ---
 
@@ -81,4 +76,3 @@ This project is licensed under the MIT License
 
 👨‍💻 Authors
 <div align="center"> <a href="https://github.com/Dalnoboihik" style="background-color: #007bff; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: bold;">Dalnoboihik</a> </div>
->>>>>>> dfce7720387d728ccfefaf3e3d06b735b93018cc
