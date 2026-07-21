@@ -1,8 +1,11 @@
+from HardView.LiveView import PyTempCpu
 import http.server
 import socketserver
 import subprocess
 import psutil
+import platform
 import json
+import winreg 
 
 PORT = 3000
 
@@ -13,13 +16,25 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 with open('index.html', 'r', encoding='utf-8') as file:
                     html_template = file.read()
 
-
                 cpu = psutil.cpu_percent()
-                html = html_template.replace('{CPU}', str(cpu))
-
                 ram = psutil.virtual_memory()
-                html = html_template.replace('{RAM}', str(ram))
+                
+                cpu_temp = PyTempCpu()
+                temp = cpu_temp.get_temp()
+                
+                try:
+                    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"HARDWARE\DESCRIPTION\System\CentralProcessor\0")
+                    infoCPU = winreg.QueryValueEx(key, "ProcessorNameString")[0]
+                except:
+                    infoCPU = platform.processor() or "Неизвестно"
+                
+                infoRAM = round(psutil.virtual_memory().total / (1024**3), 2)
 
+                html = html_template.replace('{CPU}', str(cpu))
+                html = html.replace('{RAM}', str(ram.percent))
+                html = html.replace('{infoCPU}', infoCPU)  
+                html = html.replace('{infoRAM}', str(infoRAM))  
+                html = html.replace('{temp:.1f}', str(temp)) 
 
                 self.send_response(200)
                 self.send_header('Content-type', 'text/html; charset=utf-8')
@@ -36,12 +51,12 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.end_headers()
             self.wfile.write(str(cpu).encode('utf-8'))
-        elif self.path == "/api/cpu":
+        elif self.path == "/api/ram":
             ram = psutil.virtual_memory()
             self.send_response(200)
             self.send_header('Content-type', 'text/plain; charset=utf-8')
             self.end_headers()
-            self.wfile.write(str(ram).encode('utf-8'))
+            self.wfile.write(str(ram.percent).encode('utf-8'))
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/html; charset=utf-8')
