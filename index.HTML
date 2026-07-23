@@ -2,46 +2,612 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Панель управления</title>
-    <script>
-        function updateCpu() {
-    fetch('/api/cpu')
-        .then(r => r.text())
-        .then(t => document.getElementById('cpu-value').textContent = t)
-        .catch(e => console.error(e));
-}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Панель управления · BrewSpherix</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
+        }
+        body {
+            min-height: 100vh;
+            background: #0b0e14;
+            padding: 1.2rem;
+            position: relative;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 20% 30%, #141b24 0%, #07090e 95%);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .code-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+            opacity: 0.55;
+        }
+        .code-item {
+            position: absolute;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            opacity: 0.45;
+            animation: floatCode 22s infinite linear alternate;
+            text-shadow: 0 0 12px rgba(70, 150, 255, 0.3), 0 0 30px rgba(40, 100, 200, 0.15);
+            will-change: transform;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+        .code-item:nth-child(4n+1) { color: #7bb3ff; opacity: 0.55; text-shadow: 0 0 14px #3f7bc0; }
+        .code-item:nth-child(4n+2) { color: #a8d0ff; opacity: 0.5; text-shadow: 0 0 12px #5a8ac9; }
+        .code-item:nth-child(4n+3) { color: #8fcbff; opacity: 0.6; text-shadow: 0 0 18px #2f6bb0; }
+        .code-item:nth-child(4n+4) { color: #b8dcff; opacity: 0.5; text-shadow: 0 0 16px #4a7fb5; }
+        @keyframes floatCode {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 0.35; }
+            25% { transform: translate(40px, -70px) rotate(2deg) scale(1.1); opacity: 0.6; }
+            50% { transform: translate(-30px, -20px) rotate(-1deg) scale(0.9); opacity: 0.5; }
+            75% { transform: translate(60px, 40px) rotate(3deg) scale(1.05); opacity: 0.65; }
+            100% { transform: translate(-20px, 80px) rotate(-2deg) scale(0.95); opacity: 0.4; }
+        }
+        .code-item:nth-child(odd) { animation-duration: 27s; animation-timing-function: ease-in-out; }
+        .code-item:nth-child(3n) { animation-duration: 19s; animation-direction: alternate-reverse; }
+        .code-item:nth-child(5n+2) { animation-duration: 32s; }
 
-function updateRam() {
-    fetch('/api/ram') 
-        .then(r => r.text())
-        .then(t => document.getElementById('ram-value').textContent = t)
-        .catch(e => console.error(e));
-}
+        .glass-panel {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(18, 24, 34, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(70, 130, 200, 0.12);
+            border-radius: 2.5rem;
+            padding: 2rem 2rem 2.2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(70, 130, 200, 0.06) inset;
+            position: relative;
+            z-index: 20;
+            transition: transform 0.2s ease;
+        }
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.8rem;
+            border-bottom: 1px solid rgba(70, 110, 160, 0.15);
+            padding-bottom: 0.8rem;
+        }
+        .glitch-title {
+            font-size: 2rem;
+            font-weight: 500;
+            letter-spacing: -0.5px;
+            color: #d6e6ff;
+            text-shadow: 0 0 8px rgba(60, 140, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .glitch-title span {
+            background: linear-gradient(135deg, #b0d0ff, #6a9eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 400;
+        }
+        .clock {
+            font-size: 1.1rem;
+            color: rgba(180, 210, 240, 0.4);
+            background: rgba(10, 18, 30, 0.4);
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(70, 130, 200, 0.08);
+            backdrop-filter: blur(4px);
+            letter-spacing: 1px;
+            font-weight: 300;
+            text-shadow: 0 0 10px rgba(40, 100, 200, 0.1);
+        }
+        .subhead {
+            color: #6f8bb0;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            border-left: 2px solid #2f4b70;
+            padding-left: 0.75rem;
+            opacity: 0.6;
+            margin-bottom: 1.8rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(12, 20, 32, 0.5);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            margin-bottom: 1.8rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(70, 110, 160, 0.08);
+        }
+        th {
+            background: rgba(10, 25, 45, 0.6);
+            padding: 0.9rem 1.2rem;
+            text-align: left;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6f8bb0;
+            font-weight: 400;
+        }
+        td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid rgba(30, 60, 100, 0.15);
+            color: #c8daf5;
+        }
+        .label {
+            font-weight: 500;
+            color: #b0c8e8;
+            letter-spacing: 0.3px;
+        }
+        .value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-block;
+            min-width: 50px;
+        }
+        .value.cpu { color: #6bb8ff; }
+        .value.ram { color: #ff7a7a; }
+        .bar-container {
+            width: 100%;
+            background: rgba(10, 25, 45, 0.6);
+            border-radius: 2rem;
+            height: 22px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+        }
+        .bar {
+            height: 100%;
+            border-radius: 2rem;
+            transition: width 0.3s ease;
+            position: relative;
+            width: 0%;
+        }
+        .bar.cpu-bar { background: linear-gradient(90deg, #3f8bc0, #6bb8ff); }
+        .bar.ram-bar { background: linear-gradient(90deg, #cc5555, #ff7a7a); }
+        .bar-text {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9);
+            letter-spacing: 0.5px;
+        }
+        .buttons {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.8rem;
+        }
+        .buttons button {
+            padding: 0.6rem 1.6rem;
+            background: rgba(15, 40, 70, 0.6);
+            backdrop-filter: blur(4px);
+            color: #c8daf5;
+            border: 1px solid rgba(70, 130, 200, 0.2);
+            border-radius: 3rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+        .buttons button:hover {
+            background: rgba(30, 70, 120, 0.7);
+            border-color: #4a8ac9;
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 30, 70, 0.4);
+        }
+        .buttons button.danger { border-color: #a04040; color: #e08080; }
+        .buttons button.danger:hover { background: rgba(120, 30, 30, 0.5); border-color: #cc5555; }
+        .buttons button.success { border-color: #3a8a5a; color: #80d0a0; }
+        .buttons button.success:hover { background: rgba(30, 80, 50, 0.5); border-color: #5ab87a; }
 
-setInterval(updateCpu, 1000);
-setInterval(updateRam, 1000);
+        .info-text {
+            background: rgba(12, 20, 32, 0.4);
+            border-radius: 1.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.8rem;
+            border: 1px solid rgba(70, 110, 160, 0.06);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.8rem;
+            color: #7a96b8;
+        }
+        .info-text span { 
+            color: #b8d0f0; 
+            font-weight: 400;
+            word-break: break-word;
+        }
+        .info-text .cpu-model {
+            color: #6bb8ff;
+            font-weight: 500;
+        }
 
-updateCpu();
-updateRam();
-</script>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.8rem;
+        }
+        .stat-card {
+            background: rgba(12, 20, 32, 0.4);
+            backdrop-filter: blur(4px);
+            padding: 0.8rem 0.4rem;
+            border-radius: 1.2rem;
+            text-align: center;
+            border: 1px solid rgba(70, 110, 160, 0.06);
+            transition: all 0.3s ease;
+        }
+        .stat-card .label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #6f8bb0;
+        }
+        .stat-card .value {
+            font-size: 1.6rem;
+            font-weight: 500;
+            margin-top: 0.2rem;
+            display: block;
+        }
+        .stat-card .value.cpu { color: #6bb8ff; }
+        .stat-card .value.ram { color: #ff7a7a; }
+        .stat-card .value.max-cpu { color: #ffd93d; }
+        .stat-card .value.max-ram { color: #ff9ff3; }
+
+        .chart-container {
+            background: rgba(12, 20, 32, 0.4);
+            backdrop-filter: blur(4px);
+            padding: 1.2rem;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(70, 110, 160, 0.06);
+            margin-bottom: 1.5rem;
+        }
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+        canvas {
+            max-height: 180px;
+            max-width: 100%;
+            border-radius: 0.8rem;
+        }
+        .update-time {
+            color: rgba(120, 160, 200, 0.25);
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        .footer-copy {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            color: rgba(120, 175, 220, 0.15);
+            text-shadow: 0 0 8px rgba(0,20,40,0.2);
+            border-top: 1px solid rgba(70, 110, 160, 0.04);
+            padding-top: 1.2rem;
+            font-weight: 300;
+        }
+        .footer-copy strong {
+            font-weight: 400;
+            color: rgba(140, 195, 240, 0.2);
+            letter-spacing: 1.5px;
+        }
+        @media (max-width: 700px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .chart-row { grid-template-columns: 1fr; }
+            .glass-panel { padding: 1.2rem; }
+            .header-row { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+            .glitch-title { font-size: 1.6rem; }
+            .clock { font-size: 0.9rem; padding: 0.2rem 0.8rem; }
+            .code-item { font-size: 0.6rem; }
+            .info-text { flex-direction: column; gap: 0.5rem; }
+        }
+        @media (max-width: 480px) {
+            .glass-panel { padding: 0.8rem; border-radius: 1.8rem; }
+            .buttons button { font-size: 0.7rem; padding: 0.4rem 1rem; }
+            .stat-card .value { font-size: 1.2rem; }
+            td { padding: 0.5rem 0.6rem; }
+            th { padding: 0.5rem 0.6rem; font-size: 0.6rem; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Панель управления</h1>
 
+    <div class="code-rain" aria-hidden="true">
+        <div class="code-item" style="top: 6%; left: 3%;">print("hello world")</div>
+        <div class="code-item" style="top: 12%; right: 5%;">console.log("debug");</div>
+        <div class="code-item" style="top: 24%; left: 8%;">SELECT * FROM users;</div>
+        <div class="code-item" style="top: 40%; right: 2%;">function main() { return 0; }</div>
+        <div class="code-item" style="top: 55%; left: 4%;">int x = 42;</div>
+        <div class="code-item" style="top: 68%; right: 8%;">puts("Brew");</div>
+        <div class="code-item" style="top: 82%; left: 12%;">docker run -it</div>
+        <div class="code-item" style="top: 8%; left: 42%;">npm install</div>
+        <div class="code-item" style="top: 30%; left: 65%;">git commit -m "fix"</div>
+        <div class="code-item" style="top: 48%; left: 25%;">System.out.println("ok");</div>
+        <div class="code-item" style="top: 62%; left: 50%;">pip install flask</div>
+        <div class="code-item" style="top: 78%; left: 35%;">curl -X POST /api</div>
+        <div class="code-item" style="top: 3%; left: 75%;">#!/bin/bash</div>
+        <div class="code-item" style="top: 18%; left: 85%;">make build</div>
+        <div class="code-item" style="top: 38%; left: 12%;">λ (x) → x * 2</div>
+        <div class="code-item" style="top: 52%; left: 72%;">if (err) panic();</div>
+        <div class="code-item" style="top: 72%; left: 58%;">for (i=0; i<10; i++)</div>
+        <div class="code-item" style="top: 88%; left: 20%;">class Server { }</div>
+        <div class="code-item" style="top: 15%; left: 28%;">use std::io;</div>
+        <div class="code-item" style="top: 60%; left: 85%;">response.send(200)</div>
+        <div class="code-item" style="top: 28%; left: 48%;">import requests</div>
+        <div class="code-item" style="top: 44%; left: 44%;">const PORT = 8080;</div>
+        <div class="code-item" style="top: 85%; left: 72%;">echo "deploy"</div>
+        <div class="code-item" style="top: 10%; left: 60%;">terraform plan</div>
+        <div class="code-item" style="top: 35%; left: 32%;">void setup() { }</div>
+        <div class="code-item" style="top: 58%; left: 8%;">sudo systemctl start</div>
+        <div class="code-item" style="top: 70%; left: 42%;">new Promise((res) => {})</div>
+        <div class="code-item" style="top: 92%; left: 6%;"># include <stdio.h></div>
+        <div class="code-item" style="top: 22%; left: 72%;">kubectl apply -f</div>
+        <div class="code-item" style="top: 66%; left: 18%;">db.collection.find()</div>
+    </div>
 
+    <div class="glass-panel">
+        <div class="header-row">
+            <div class="glitch-title"><span>⧩</span> панель</div>
+            <div class="clock" id="liveClock">--:--:--</div>
+        </div>
+        <div class="subhead">BrewSpherix · управление сервером</div>
 
-    <button>Выключение</button>
-    <button>Перезагрузка</button>
-    <button onclick="fetch('/run_bat', {method: 'POST'})">Запуск bat</button>
+        <table>
+            <tr><th>показатель</th><th>значение</th><th>шкала</th></tr>
+            <tr>
+                <td class="label">CPU</td>
+                <td><span class="value cpu" id="cpu-value">0</span>%</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar cpu-bar" id="cpu-bar" style="width:0%;"><span class="bar-text" id="cpu-bar-text">0%</span></div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">RAM</td>
+                <td><span class="value ram" id="ram-value">0</span>%</td>
+                <td>
+                    <div class="bar-container">
+                        <div class="bar ram-bar" id="ram-bar" style="width:0%;"><span class="bar-text" id="ram-bar-text">0%</span></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
-    
-    <h1>Загрузка CPU: <span id="cpu-value">{CPU}</span>%</h1>
-    <h1>Загрузка RAM: <span id="ram-value">{RAM}</span>%</h1>
+        <div class="buttons">
+            <button class="danger" onclick="shutdown()">выключение</button>
+            <button class="danger" onclick="reboot()">перезагрузка</button>
+        </div>
 
-    <h1>Процессор: <span id="infoCPU">{infoCPU}</span></h1>
-    <h1>Оперативная память: <span id="infoRAM">{infoRAM} ГБ</span></h1>
-    
+        <div class="info-text">
+            <div>Процессор: <span class="cpu-model" id="infoCPU">{infoCPU}</span></div>
+            <div>Оперативная память: <span id="infoRAM">{infoRAM}</span> ГБ</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="label">текущий CPU</div><div class="value cpu" id="stat-cpu">0%</div></div>
+            <div class="stat-card"><div class="label">текущий RAM</div><div class="value ram" id="stat-ram">0%</div></div>
+            <div class="stat-card"><div class="label">максимальный CPU</div><div class="value max-cpu" id="stat-max-cpu">0%</div></div>
+            <div class="stat-card"><div class="label">максимальный RAM</div><div class="value max-ram" id="stat-max-ram">0%</div></div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-row">
+                <div><canvas id="cpuChart"></canvas></div>
+                <div><canvas id="ramChart"></canvas></div>
+            </div>
+        </div>
+
+        <div class="update-time" id="updateTime">обновление: загрузка...</div>
+        <div class="footer-copy"><strong>BREWSKI BrewSpherix 2026</strong></div>
+    </div>
+
+    <script>
+        (function() {
+            let cpuChart, ramChart;
+            let historyData = [];
+            const MAX_HISTORY = 60;
+            let statsUpdateInterval = null;
+            let currentUpdateInterval = null;
+
+            function initCharts() {
+                const ctx1 = document.getElementById('cpuChart').getContext('2d');
+                const ctx2 = document.getElementById('ramChart').getContext('2d');
+
+                cpuChart = new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'CPU %',
+                            data: [],
+                            borderColor: '#6bb8ff',
+                            backgroundColor: 'rgba(79, 195, 247, 0.08)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: true, labels: { color: '#8aa9d1', font: { size: 9 } } },
+                            title: { display: true, text: 'история CPU', color: '#6f8bb0', font: { size: 10 } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, max: 100, ticks: { color: '#4a6080', font: { size: 7 }, callback: v => v + '%' } },
+                            x: { ticks: { color: '#4a6080', font: { size: 7 }, maxTicksLimit: 12 } }
+                        }
+                    }
+                });
+
+                ramChart = new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'RAM %',
+                            data: [],
+                            borderColor: '#ff7a7a',
+                            backgroundColor: 'rgba(255, 107, 107, 0.08)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: true, labels: { color: '#8aa9d1', font: { size: 9 } } },
+                            title: { display: true, text: 'история RAM', color: '#6f8bb0', font: { size: 10 } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, max: 100, ticks: { color: '#4a6080', font: { size: 7 }, callback: v => v + '%' } },
+                            x: { ticks: { color: '#4a6080', font: { size: 7 }, maxTicksLimit: 12 } }
+                        }
+                    }
+                });
+            }
+
+            function updateClock() {
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('liveClock').textContent = h + ':' + m + ':' + s;
+            }
+
+            function updateCurrent() {
+                fetch('/api/cpu')
+                    .then(r => r.text())
+                    .then(cpu => {
+                        const cpuVal = parseFloat(cpu) || 0;
+                        document.getElementById('cpu-value').textContent = Math.round(cpuVal);
+                        document.getElementById('cpu-bar').style.width = Math.min(cpuVal, 100) + '%';
+                        document.getElementById('cpu-bar-text').textContent = Math.round(cpuVal) + '%';
+                        document.getElementById('stat-cpu').textContent = Math.round(cpuVal) + '%';
+                    })
+                    .catch(() => {});
+
+                fetch('/api/ram')
+                    .then(r => r.text())
+                    .then(ram => {
+                        const ramVal = parseFloat(ram) || 0;
+                        document.getElementById('ram-value').textContent = Math.round(ramVal);
+                        document.getElementById('ram-bar').style.width = Math.min(ramVal, 100) + '%';
+                        document.getElementById('ram-bar-text').textContent = Math.round(ramVal) + '%';
+                        document.getElementById('stat-ram').textContent = Math.round(ramVal) + '%';
+                    })
+                    .catch(() => {});
+
+                const now = new Date();
+                const label = String(now.getHours()).padStart(2, '0') + ':' + 
+                             String(now.getMinutes()).padStart(2, '0') + ':' + 
+                             String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('updateTime').textContent = 'обновление: ' + label;
+            }
+
+            function updateStats() {
+                fetch('/api/stats')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data && data.history) {
+                            const history = data.history;
+                            const cpuData = history.map(d => d.cpu);
+                            const ramData = history.map(d => d.ram);
+                            const labels = history.map(d => {
+                                const t = new Date(d.time);
+                                return String(t.getHours()).padStart(2, '0') + ':' + 
+                                       String(t.getMinutes()).padStart(2, '0');
+                            });
+
+                            cpuChart.data.labels = labels;
+                            cpuChart.data.datasets[0].data = cpuData;
+                            cpuChart.update();
+
+                            ramChart.data.labels = labels;
+                            ramChart.data.datasets[0].data = ramData;
+                            ramChart.update();
+
+                            if (data.max_cpu) {
+                                document.getElementById('stat-max-cpu').textContent = Math.round(data.max_cpu) + '%';
+                            }
+                            if (data.max_ram) {
+                                document.getElementById('stat-max-ram').textContent = Math.round(data.max_ram) + '%';
+                            }
+                        }
+                    })
+                    .catch(() => {});
+            }
+
+            function shutdown() {
+                if (confirm('Выключить компьютер?')) {
+                    fetch('/shutdown', { method: 'POST' })
+                        .then(r => r.text())
+                        .then(msg => alert(msg))
+                        .catch(() => alert('Ошибка отправки команды выключения'));
+                }
+            }
+
+            function reboot() {
+                if (confirm('Перезагрузить компьютер?')) {
+                    fetch('/reboot', { method: 'POST' })
+                        .then(r => r.text())
+                        .then(msg => alert(msg))
+                        .catch(() => alert('Ошибка отправки команды перезагрузки'));
+                }
+            }
+
+            window.onload = function() {
+                initCharts();
+                updateClock();
+                
+                setTimeout(() => {
+                    updateCurrent();
+                    updateStats();
+                }, 500);
+
+                setInterval(updateClock, 1000);
+                
+                if (currentUpdateInterval) clearInterval(currentUpdateInterval);
+                currentUpdateInterval = setInterval(updateCurrent, 1000);
+                
+                if (statsUpdateInterval) clearInterval(statsUpdateInterval);
+                statsUpdateInterval = setInterval(updateStats, 3600000);
+            };
+
+            window.shutdown = shutdown;
+            window.reboot = reboot;
+        })();
+    </script>
 
 </body>
 </html>
