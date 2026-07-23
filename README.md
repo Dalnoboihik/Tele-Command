@@ -158,7 +158,7 @@ Any suggestions, ideas, and pull requests are welcome. If you find a bug or want
 ## Contact
 
 - GitHub: Dalnoboihik
-- Email: dalnoboihik@example.com (replace with actual)
+- Email: ngorbunov520@gmail.com
 
 ---
 
