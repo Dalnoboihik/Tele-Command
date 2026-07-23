@@ -240,3 +240,4 @@ if __name__ == "__main__":
         print(f"http://localhost:{PORT}")
         print("Логин: admin, Пароль: admin")
         httpd.serve_forever()
+        

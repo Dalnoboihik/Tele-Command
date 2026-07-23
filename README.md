@@ -111,8 +111,6 @@ brewspherix/
 ├── server.py          # Main Python server
 ├── index.html         # Management panel (main page)
 ├── login.html         # Authorization page
-├── Clean.bat          # Example cleanup script
-├── reboot.bat         # Reboot script
 └── README.md          # Documentation
 
 ---
